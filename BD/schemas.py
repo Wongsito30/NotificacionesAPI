@@ -53,6 +53,7 @@ class grupo(BaseModel):
 
 class personaladministrativo(BaseModel):
      id: Optional[int] = None
+     admin: str
      fecha: date
      mensaje: str
  

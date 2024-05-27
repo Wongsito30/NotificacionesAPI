@@ -28,9 +28,14 @@ async def show_notiAdministrativos(db:session=Depends(get_MsgAdministrativos)):
     notificacion = db.query(page_models.Personaladmin).all()
     return notificacion
 
+@router.get("/verAdministrativos/")
+async def show_Administrativos(db:session=Depends(get_MsgAdministrativos)):
+    notificacion = db.query(page_models.Personaladmin.admin).all()
+    return notificacion
+
 @router.post("/registrarNotificacionesAdministrativos/",response_model=page_schemas.personaladministrativo)
 def create_notiAdministrativos(entrada:page_schemas.personaladministrativo,db:session=Depends(get_MsgAdministrativos)):
-    notificacion = page_models.Personaladmin(fecha = entrada.fecha,mensaje = entrada.mensaje)
+    notificacion = page_models.Personaladmin(admin = entrada.admin, fecha = entrada.fecha,mensaje = entrada.mensaje)
     db.add(notificacion)
     db.commit()
     db.refresh(notificacion)
@@ -39,6 +44,7 @@ def create_notiAdministrativos(entrada:page_schemas.personaladministrativo,db:se
 @router.put("/CambiarMensajeAdministrativos/{Notificacion_id}",response_model=page_schemas.personaladministrativo)
 def mod_noti_Administrativos(notiid: int, entrada:page_schemas.personaladministrativo,db:session=Depends(get_MsgAdministrativos)):
     NotiAdministrativos = db.query(page_models.Personaladmin).filter_by(id=notiid).first()
+    NotiAdministrativos.admin = entrada.admin
     NotiAdministrativos.fecha = entrada.fecha
     NotiAdministrativos.mensaje = entrada.mensaje
 

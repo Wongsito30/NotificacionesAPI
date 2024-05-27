@@ -49,5 +49,6 @@ class Personaladmin(Base):
     __tablename__ = 'personaladministrativo'
 
     id = Column(Integer, primary_key=True, index=True)
+    admin = Column(String(16))
     fecha = Column(String(Date))
     mensaje =  Column(String(500))
