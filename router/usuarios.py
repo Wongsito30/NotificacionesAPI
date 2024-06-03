@@ -8,6 +8,8 @@ from passlib.context import CryptContext
 import BD.schemas as page_schemas
 import BD.conexion as page_conexion
 import BD.modelos as page_models
+import random
+import yagmail
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 page_models.Base.metadata.create_all(bind=engine)
@@ -34,7 +36,7 @@ async def show_User(db:session=Depends(get_Users)):
 def create_user(entrada:page_schemas.User,db:session=Depends(get_Users)):
     hashed_password = pwd_context.hash(entrada.contrasena)
     #codigo1 = random.randint(1000, 9999)
-    usuario = page_models.Usuarios(nickname = entrada.nickname,contrasena = hashed_password, nombrecarrera = entrada.nombrecarrera, grupo = entrada.grupo, administrativo = entrada.administrativo)
+    usuario = page_models.Usuarios(nickname = entrada.nickname,contrasena = hashed_password, nombrecarrera = entrada.nombrecarrera, grupo = entrada.grupo)
     db.add(usuario)
     db.commit()
     db.refresh(usuario)

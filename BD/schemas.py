@@ -9,7 +9,7 @@ class User(BaseModel):
      contrasena: str
      nombrecarrera: Optional[str] = None 
      grupo: Optional[str] = None
-     administrativo: Optional[str] = None
+
 
      class Config:
        from_attributes = True

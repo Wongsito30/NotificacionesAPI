@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from typing import List
 from starlette.responses import RedirectResponse
+from sqlalchemy import create_engine, asc, desc, func
 from sqlalchemy.orm import session
 from fastapi.params import Depends
 from BD.conexion import engine, sessionlocal
@@ -27,6 +28,30 @@ async def Main():
 async def show_notiFacul(db:session=Depends(get_Msgfacultad)):
     notificacion = db.query(page_models.Facultad).all()
     return notificacion
+
+@router.get("/notificacionfacultad/fechaasc", response_model=List[page_schemas.facultad])
+async def get_noti_ascending(
+    db: session = Depends(get_Msgfacultad),
+    field: str = Query("fecha")
+):
+    if field not in page_models.Facultad.__table__.columns:
+        return {"error": "Campo no válido"}
+
+    # Ordena de menor a mayor
+    noti = db.query(page_models.Facultad).order_by(asc(field)).all()
+    return noti
+
+@router.get("/notificacionfacultad/fechadesc", response_model=List[page_schemas.facultad])
+async def get_noti_descending(
+    db: session = Depends(get_Msgfacultad),
+    field: str = Query("fecha")
+):
+    if field not in page_models.Facultad.__table__.columns:
+        return {"error": "Campo no válido"}
+
+    # Ordena de mayor a menor
+    noti = db.query(page_models.Facultad).order_by(desc(field)).all()
+    return noti
 
 @router.post("/registrarNotificacionesFacultad/",response_model=page_schemas.facultad)
 def create_notifacul(entrada:page_schemas.facultad,db:session=Depends(get_Msgfacultad)):

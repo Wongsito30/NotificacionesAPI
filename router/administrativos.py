@@ -1,7 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from typing import List
 from starlette.responses import RedirectResponse
 from sqlalchemy.orm import session
+from sqlalchemy import create_engine, asc, desc, func
 from fastapi.params import Depends
 from BD.conexion import engine, sessionlocal
 import BD.schemas as page_schemas
@@ -29,9 +30,39 @@ async def show_notiAdministrativos(db:session=Depends(get_MsgAdministrativos)):
     return notificacion
 
 @router.get("/verAdministrativos/")
-async def show_Administrativos(db:session=Depends(get_MsgAdministrativos)):
-    notificacion = db.query(page_models.Personaladmin.admin).all()
-    return notificacion
+async def show_Administrativos(db: session = Depends(get_MsgAdministrativos)):
+    administrativos = db.query(page_models.Personaladmin).all()
+    return {"administrativos": [admin.admin for admin in administrativos]}
+
+@router.get("/searchNotiNombreAdmin/{adminname}", response_model=List[page_schemas.personaladministrativo])
+async def show_NotiNomCarrera(adminname: str, db: session = Depends(get_MsgAdministrativos)):
+    # Filtra las notificaciones que coinciden con el nombre
+    noti = db.query(page_models.Personaladmin).filter(func.lower(page_models.Personaladmin.admin).ilike(f"%{adminname}%")).all()
+    return noti
+
+@router.get("/notificacion/fechaasc", response_model=List[page_schemas.personaladministrativo])
+async def get_noti_ascending(
+    db: session = Depends(get_MsgAdministrativos),
+    field: str = Query("fecha")
+):
+    if field not in page_models.Personaladmin.__table__.columns:
+        return {"error": "Campo no válido"}
+
+    # Ordena de menor a mayor
+    noti = db.query(page_models.Personaladmin).order_by(asc(field)).all()
+    return noti
+
+@router.get("/notificacion/fechadesc", response_model=List[page_schemas.personaladministrativo])
+async def get_noti_descending(
+    db: session = Depends(get_MsgAdministrativos),
+    field: str = Query("fecha")
+):
+    if field not in page_models.Personaladmin.__table__.columns:
+        return {"error": "Campo no válido"}
+
+    # Ordena de mayor a menor
+    noti = db.query(page_models.Personaladmin).order_by(desc(field)).all()
+    return noti
 
 @router.post("/registrarNotificacionesAdministrativos/",response_model=page_schemas.personaladministrativo)
 def create_notiAdministrativos(entrada:page_schemas.personaladministrativo,db:session=Depends(get_MsgAdministrativos)):

@@ -7,6 +7,7 @@ from router import administrativos
 from router import carrera
 from router import facultad
 from router import grupos
+from router import loginadmin
 
 
 app = FastAPI()
@@ -21,13 +22,14 @@ app.add_middleware(
 )
 
 
-app.include_router(login.router)
-app.include_router(usuarios.router)
-app.include_router(admin.router)
-app.include_router(administrativos.router)
-app.include_router(carrera.router)
-app.include_router(facultad.router)
-app.include_router(grupos.router)
+app.include_router(login.router, tags=["login"])
+app.include_router(loginadmin.router, tags=["login admin"])
+app.include_router(usuarios.router, tags=["Usuarios Crud"])
+app.include_router(admin.router, tags=["admin crud"])
+app.include_router(administrativos.router, tags=["notificaciones administrativos"])
+app.include_router(carrera.router, tags=["notificaciones carrera"])
+app.include_router(facultad.router, tags=["notificaciones facultad"])
+app.include_router(grupos.router, tags=["grupos"])
 
 
 @app.get("/")
